@@ -24,10 +24,10 @@ US1～US4。任何 UI 不得绕过 `AccessFlowGateway` 或复制领域规则。
 
 **目标**：得到能够启动、测试、类型检查和构建的最小 React + TypeScript 工程；此阶段不实现业务功能。
 
-- [ ] T001 按 plan 的固定技术栈初始化 Vite React TypeScript 单包工程，安装 React Router、TanStack Query、React Hook Form、Zod、idb、Tailwind、Vitest/RTL 与 Playwright，预置 dev/build/typecheck/lint/test/test:e2e scripts，并建立 `package.json`、`package-lock.json`、`index.html`、`src/main.tsx`（Plan：技术上下文与关键技术决策）
-- [ ] T002 [P] 开启 TypeScript strict、无类型逃逸的编译检查和 Vite 模板 ESLint 基线，配置 `tsconfig.json`、`eslint.config.js`（Constitution I、VII）
-- [ ] T003 [P] 配置 Vite React 与 Tailwind 4 插件、中文页面基础样式和清晰的 `:focus-visible`，完成 `vite.config.ts`、`src/index.css`（Plan：样式与无障碍）
-- [ ] T004 [P] 配置 Vitest/jsdom/RTL/user-event/jest-dom 与 Chromium Playwright，完成 `vitest.config.ts`、`playwright.config.ts`、`src/test/setup.ts`（Constitution VI；Plan：测试策略）
+- [X] T001 按 plan 的固定技术栈初始化 Vite React TypeScript 单包工程，安装 React Router 7、TanStack Query、React Hook Form、Zod、idb、Tailwind、Vitest/RTL 与 Playwright，预置 dev/build/typecheck/lint/test/test:e2e scripts，并建立 `package.json`、`package-lock.json`、`index.html`、`src/main.tsx`（Plan：技术上下文与关键技术决策）
+- [X] T002 [P] 开启 TypeScript strict、无类型逃逸的编译检查和 Vite 模板 ESLint 基线，配置 `tsconfig.json`、`eslint.config.js`（Constitution I、VII）
+- [X] T003 [P] 配置 Vite React 与 Tailwind 4 插件、中文页面基础样式和清晰的 `:focus-visible`，完成 `vite.config.ts`、`src/index.css`（Plan：样式与无障碍）
+- [X] T004 [P] 配置 Vitest/jsdom/RTL/user-event/jest-dom 与 Chromium Playwright，完成 `vitest.config.ts`、`playwright.config.ts`、`src/test/setup.ts`（Constitution VI；Plan：测试策略）
 
 **Checkpoint**：`npm run dev` 能打开空应用，`npm run typecheck`、`npm run lint`、空测试命令和 production build 可执行。
 

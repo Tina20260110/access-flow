@@ -16,7 +16,7 @@ React Context 只保存当前 Demo 用户 ID；IndexedDB 通过统一 `AccessFlo
 
 **语言/版本**：Node.js `22.22+`；TypeScript `6.0.x` strict；React `19.2.x`
 
-**主要依赖**：Vite `8.x`、React Router `8.x` Declarative Mode、TanStack Query `5.x`、Tailwind CSS
+**主要依赖**：Vite `8.x`、React Router `7.x` Declarative Mode、TanStack Query `5.x`、Tailwind CSS
 `4.x`、React Hook Form `7.x`、`@hookform/resolvers` `5.x`、Zod `4.x`、`idb` `8.x`
 
 **存储**：IndexedDB 单 object store、单 versioned document 保存业务数据；小型 `localStorage` 偏好 adapter

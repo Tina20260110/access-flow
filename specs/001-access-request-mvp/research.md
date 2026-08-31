@@ -6,7 +6,7 @@
 `@vitejs/plugin-react` `6.x`。使用 npm 和单一 lockfile；只采用稳定版本的最新补丁，不采用 beta、RC、
 nightly 或 React Compiler 模板。
 
-**理由**：该组合满足 React Router 8 与 Vite 8 的兼容基线。Vite 的 React TypeScript 模板启动成本低，
+**理由**：该组合满足 React Router 7 与 Vite 8 的兼容基线。Vite 的 React TypeScript 模板启动成本低，
 适合 3～5 天的单页应用。Vite 只转译 TypeScript，因此必须另设 `tsc --noEmit` 类型检查，并显式开启
 `strict`。[React 版本](https://react.dev/versions)、[Vite 8](https://vite.dev/blog/announcing-vite8)、
 [Vite TypeScript 说明](https://vite.dev/guide/features.html)、
@@ -18,7 +18,7 @@ lint 与工具链兼容验证工作，故本次固定在 6.0 稳定线。保留 
 
 ## 2. 路由与 Server State
 
-**决策**：使用 React Router `8.x` Declarative Mode，仅负责页面、路径参数和 URL 查询参数；使用
+**决策**：使用 React Router `7.x` Declarative Mode，仅负责页面、路径参数和 URL 查询参数；使用
 TanStack Query `5.x` 管理 Demo Users、资源目录、申请列表、详情以及创建和审批 mutation。
 
 **理由**：React Router 的 Declarative Mode 足以支持当前三个业务页面，不需要 loader/action 或框架模式。
