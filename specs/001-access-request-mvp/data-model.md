@@ -196,6 +196,19 @@ type PersistedDemoState = Readonly<{
 
 ## 状态转换
 
+### 共享审批资格规则
+
+`src/domain/request-transitions.ts` 提供可由 UI、状态转换和 Gateway 共同调用的纯 capability predicates：
+
+- `canDecideRequest(request, actorId)`：仅当申请为 `Pending`、`actorId === request.approverId` 且
+  `actorId !== request.requesterId` 时返回 true；拒绝操作的业务资格使用该结果，拒绝原因仍由命令校验负责。
+- `canApproveRequest(request, actorId, decisionDate)`：先复用 `canDecideRequest`，再要求 `accessUntil` 晚于
+  `decisionDate`；到期申请不能批准，但仍可按正常规则拒绝。
+
+`ApprovalPanel` 只能使用这些共享 predicate 决定审批操作是否显示或启用，不得重写条件。真正执行命令时，
+状态转换与 Gateway 必须在最新持久化记录的写事务内再次调用同一领域规则，并另行验证 `expectedRevision`；
+UI 的判断不能替代业务边界。
+
 | 当前状态 | 命令 | 前置条件 | 结果 |
 |---|---|---|---|
 | 无 | Create | actor 是有效 DemoUser；字段有效；资源权限有映射；存在非本人审批候选员工 | `Pending`，revision 1 |
@@ -204,8 +217,8 @@ type PersistedDemoState = Readonly<{
 | Approved | Approve/Reject | 无合法转换 | `CONFLICT`，保持原记录 |
 | Rejected | Approve/Reject | 无合法转换 | `CONFLICT`，保持原记录 |
 
-批准与拒绝必须在 IndexedDB 同一写事务中基于最新持久化记录执行。UI 缓存只提供 `expectedRevision`，
-不能成为状态转换的事实来源。
+批准与拒绝必须在 IndexedDB 同一写事务中基于最新持久化记录执行，并由状态转换复用上述 capability
+predicates。UI 缓存只提供 `expectedRevision`，不能成为状态转换的事实来源。
 
 ## 数据访问命令
 

@@ -63,10 +63,11 @@ Gateway 必须按以下顺序执行：
 两个操作必须在 IndexedDB 同一 `readwrite` 事务中完成：
 
 1. 读取并校验最新根状态。
-2. 查找申请并验证仍为 Pending。
-3. 验证 `revision === expectedRevision`。
-4. 验证 `actorId === request.approverId` 且 `actorId !== request.requesterId`。
-5. 批准时验证截止日期晚于批准日；拒绝时验证原因去除首尾空白后非空。
+2. 查找申请，并把最新持久化记录交给 domain transition。
+3. domain transition 验证申请仍为 Pending 且 `revision === expectedRevision`。
+4. domain transition 调用共享 capability predicate，验证 `actorId === request.approverId`、
+   `actorId !== request.requesterId` 及其他适用的审批资格，不在 adapter 内复制资格规则。
+5. 批准时通过共享 predicate 验证截止日期晚于批准日；拒绝时验证原因去除首尾空白后非空。
 6. 生成对应 ApprovalRecord、终态和 `revision + 1`，校验完整根状态后一次写回。
 7. 等待事务完成后返回终态。
 
@@ -109,19 +110,15 @@ Query keys：
 ['accessRequests', 'detail', requestId, viewerId]
 ```
 
-- 所有 query 使用 `networkMode: 'always'`，因为数据源不依赖联网状态。
+- 所有基于本地 `AccessFlowGateway` 的 query 和 mutation 使用 `networkMode: 'always'`，因为数据源不依赖
+  联网状态。
 - Demo Users 与资源目录使用长 `staleTime`；申请列表与详情使用短而非零的 `staleTime`。
 - 创建成功：以返回值填充新详情缓存，失效全部申请列表变体。
 - 批准/拒绝成功：以返回值更新当前详情，失效全部申请列表变体。
 - `CONFLICT`：立即失效当前详情和申请列表，重取后展示最终状态。
+- 窗口重新获得焦点时，申请 query 可按正常 Query 策略重新获取最新持久化状态。
 - 重置成功：清除领域 query，恢复默认身份并导航到列表，然后重新获取 active queries。
 - mutation 使用保守更新；TanStack Query cache 永远不是业务持久化来源。
-
-## 浏览器多页面同步
-
-IndexedDB 事务保证写入一致性。adapter 在成功写入后发送轻量版本通知；其他页面收到通知时只使领域 query
-失效并重新读取，不把通知载荷当作业务事实来源。若通知能力不可用，窗口重新聚焦时的 query refresh 仍能恢复
-最新持久化状态。
 
 ## 重置 Demo 数据
 

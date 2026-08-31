@@ -31,6 +31,10 @@
 未知参数忽略。一个无效参数不得使其他有效参数丢失。申请原因、拒绝原因、表单草稿和其他敏感正文禁止写入
 URL。
 
+`q`、`status`、`risk`、`page` 均为单值参数。同一参数出现多次时只采用第一个值并忽略后续值，解析后必须
+将 URL replace 规范化为只保留一个值。若第一个值本身无效，则按该参数现有 invalid fallback 规则处理，
+不得改用后续合法值。
+
 ## 解析与序列化
 
 `parseListQuery(URLSearchParams)` 与 `serializeListQuery(ListQueryState)` 必须是无 React 依赖的纯函数，并满足：
@@ -38,7 +42,7 @@ URL。
 - 原始 URL 值先作为不可信输入逐项通过 Zod 校验，不使用类型断言。
 - parse 后得到完整 `ListQueryState`，不返回语义不明的 `undefined`。
 - `serialize(parse(serialize(state)))` 得到相同的规范状态。
-- 默认值不写入 URL，参数顺序保持稳定，生成可比较、可分享的地址。
+- 默认值不写入 URL，重复单值参数只序列化解析采用的第一个值，参数顺序保持稳定，生成可比较、可分享的地址。
 - 页面首次发现非规范参数时使用 replace 修正，不添加无意义历史记录。
 
 ## 更新历史规则

@@ -28,7 +28,7 @@ React Context 只保存当前 Demo 用户 ID；IndexedDB 通过统一 `AccessFlo
 
 **项目类型**：单包、纯前端 Web 应用；无真实后端、认证服务或第三方企业集成
 
-**性能目标**：至少 1,000 条可见申请时，95% 搜索、筛选和翻页在 2 秒内显示结果或明确状态；不设未经测量的
+**性能目标**：至少 1,000 条可见申请时，搜索、筛选和翻页交互的汇总样本 P95 不超过 2 秒；不设未经测量的
 额外微性能指标
 
 **约束**：3～5 天完成；严格类型安全；业务数据跨刷新和重开持续；URL 可恢复；审批 mutation 不可重复且必须
@@ -176,7 +176,7 @@ gateway；持久化 adapter 不返回未经校验的原始数据。
 | 搜索、状态、风险、页码 | URL | 已提交查询的唯一来源；search/filter 改变时 page 重置为 1 |
 | 搜索草稿、拒绝原因、dialog 开关 | 最近的 feature component | 当前交互；关闭或离开后销毁 |
 | 当前 Demo 用户 ID | App 根级 React Context | 唯一 global client state；经 `localStorage` 偏好 adapter 校验并恢复 |
-| 当前 Demo 用户对象、风险、审批资格 | 派生值 | 从 ID、目录或申请计算，禁止重复保存 |
+| 当前 Demo 用户对象、风险、审批资格 | 派生值 | 从 ID、目录或共享 domain capability predicate 计算，禁止重复保存或在 UI 复制规则 |
 
 不引入 Zustand。当前身份只有一个跨页面标量，Context 足够；完整用户仍由 Query 管理。身份切换使带 viewerId
 的 query key 自然变化，并从创建/详情页返回列表，避免旧身份上下文残留。
@@ -214,13 +214,18 @@ gateway；持久化 adapter 不返回未经校验的原始数据。
 `Rejected` 必须携带含非空原因的拒绝记录。完整字段、关系、转换和 revision 规则见
 [data-model.md](data-model.md)。
 
+`domain/request-transitions.ts` 提供共享纯 capability predicates：`canDecideRequest(request, actorId)` 统一判断
+Pending、负责人关系和禁止自审批，`canApproveRequest(request, actorId, decisionDate)` 在此基础上增加截止日期
+有效性。`ApprovalPanel` 只能调用这些共享 predicate 决定审批操作的显示或启用；状态转换与 Gateway 在写事务
+内再次调用相同领域规则并校验 `expectedRevision`，UI 判断不构成最终业务边界。
+
 | 边界 | Zod 校验责任 |
 |---|---|
 | IndexedDB 读取 | 根 schemaVersion、判别联合、ID 唯一性、引用和申请关系；失败进入可重置错误状态 |
-| URL 参数 | q trim；status/risk 枚举；page 正整数；坏参数独立回退并规范化 |
+| URL 参数 | q trim；status/risk 枚举；page 正整数；单值参数重复时取第一个；坏参数独立回退并规范化 |
 | 创建表单 | 必填、非空白原因、有效资源权限组合、截止日期晚于提交日 |
 | 拒绝表单 | 去除首尾空白后非空，并与字段错误关联 |
-| Gateway command | 重复校验 actor 身份、申请关系、映射、审批人、截止日期、状态和 revision，不信任 UI |
+| Gateway command | 在写事务内调用共享 domain 规则校验 actor、申请关系、审批资格、截止日期、状态和 revision，不信任 UI 或复制规则 |
 | Gateway 返回值 | adapter 返回前解析为可信领域联合，Query hooks 不接收 `unknown` |
 | Seed | 编译期 `satisfies` 加启动时 schema/关系校验 |
 
@@ -237,8 +242,10 @@ gateway；持久化 adapter 不返回未经校验的原始数据。
 | 拒绝 | 禁用整个审批区，保留输入 | 终态不再显示操作 | 空白原因关联字段；transient 保留原因；conflict 重取 | 返回并展示唯一 Rejected 终态 |
 | 重置 | 禁用确认按钮并显示处理中 | 不适用 | 原数据保持不变并允许重试 | 清缓存、恢复默认身份与 seed |
 
-Query 使用 `networkMode: 'always'`。Demo Users/Resources 的 `staleTime` 为 Infinity，重置时显式清除；申请
-query 使用约 15 秒 staleTime 并在窗口重新聚焦时刷新。创建/审批成功后按 contract 精确更新详情和失效列表。
+所有基于本地 `AccessFlowGateway` 的 Query query/mutation 使用 `networkMode: 'always'`。Demo Users/Resources
+使用较长 `staleTime`（MVP 取 Infinity，重置时显式清除）；申请列表与详情使用较短的约 15 秒 `staleTime`，
+并允许在窗口重新聚焦时刷新。创建/审批成功后按 contract 精确更新详情和失效列表；Query cache 始终只是
+server state 缓存，不是业务持久化事实来源。
 
 ## 无障碍计划
 
@@ -256,9 +263,11 @@ query 使用约 15 秒 staleTime 并在窗口重新聚焦时刷新。创建/审�
 ### Unit Tests
 
 - 风险映射精确命中及未映射失败；有序审批人跳过申请人及无合格审批人失败。
-- `Pending → Approved/Rejected`、自审批、非负责人、终态重复处理、过期批准和 revision 冲突。
+- 共享审批 capability predicates 及 `Pending → Approved/Rejected` 转换，覆盖自审批、非负责人、终态重复处理、
+  过期批准和 revision 冲突，并验证 transition 复用同一资格规则。
 - 判别联合和根持久化 schema 拒绝非法状态、损坏引用与未知 schemaVersion。
-- URL 缺失/无效/重复/越界参数、parse/serialize 往返、查询变化重置 page。
+- URL 缺失/无效/越界参数、合法重复参数、首个值无效但后续值合法、parse → canonical serialize 确定性和
+  查询变化重置 page。
 - 创建与拒绝表单 schema，包括纯空白和截止日期边界。
 
 ### Integration Tests
@@ -273,8 +282,9 @@ query 使用约 15 秒 staleTime 并在窗口重新聚焦时刷新。创建/审�
 
 ### Playwright E2E
 
-1. 核心批准闭环：重置 → 员工创建申请 → 刷新 → 切换到该申请的 `approverId` 员工 → 找到并批准 → 刷新 →
-   切回该申请的 `requesterId` 员工查看最终结果。
+1. 核心批准闭环：不使用开发者工具、手工修改持久化数据或页面外操作，仅通过 UI 完成重置 → 员工创建申请 →
+   查找申请 → 查看详情 → 切换到该申请的 `approverId` 员工 → 批准 → 切回该申请的 `requesterId` 员工查看
+   最终结果，并直接核对状态、风险和当前下一步。
 2. 高风险持久化/冲突场景：两个页面持有同一 Pending revision，首个决定成功，第二个显示冲突并恢复相同终态。
 
 Reject 分支和错误注入留在 integration tests。默认只跑 Chromium；不设置覆盖率门槛，不扩展三浏览器矩阵。
@@ -285,7 +295,11 @@ Reject 分支和错误注入留在 integration tests。默认只跑 Chromium；�
 - search 只在提交时更新 URL；筛选和翻页一次性更新，避免每次输入都查询和污染 history。
 - 列表保持稳定排序，查询更新时保留上一结果；不保存可派生的重复列表。
 - 静态目录长缓存，业务 mutation 后精确失效；不增加第二层可变内存数据库。
-- 使用至少 1,000 条 fixture 验证 SC-003；只有测量超标才考虑索引、memoization 或虚拟列表。
+- jsdom 使用至少 1,000 条 fixture 验证搜索、筛选、稳定排序和分页正确性，并发现明显算法问题；其墙钟时间
+  不作为 SC-003 正式性能证据。
+- SC-003 仅按 quickstart 的真实浏览器协议验收：Chromium + production preview、至少 1,000 条当前员工可见
+  申请，文本搜索、状态筛选、风险筛选、组合筛选和翻页各执行 20 次，从提交操作到新结果或明确状态可见，
+  汇总样本 P95 必须不超过 2 秒；首次应用启动时间不计入。
 - MVP 不使用路由级预取、虚拟列表、复杂 memoization 或自定义缓存算法。
 
 ## 3～5 天交付顺序
