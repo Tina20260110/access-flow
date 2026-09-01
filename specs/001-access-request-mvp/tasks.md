@@ -118,11 +118,11 @@ SC-003、SC-004、SC-006、SC-007。
 **独立测试**：分别以 requester、approver 和无关员工直达同一 requestId；前两者看到完整信息并可刷新恢复，
 无关员工与未知 ID 得到相同不可用反馈；再验证 High Risk、暂无记录、终态记录和加载失败重试。
 
-- [ ] T037 [P] [US3] 为 Gateway 详情查询补充 requester/approver 可见、无关员工与未知 ID 同为 `NOT_FOUND`、Pending/Approved/Rejected 详情形状的集成测试，写入 `src/features/request-detail/request-detail.gateway.test.ts`（FR-016、FR-017、FR-028）
-- [ ] T038 [P] [US3] 先编写详情页面集成测试，覆盖直达/重挂载、四态、全部字段、暂无审批记录、批准/拒绝记录、直接可见的状态与风险、无需展开即可识别的当前下一步、High Risk/最终状态/关键下一步的非颜色表达、重试和标题焦点，写入 `src/features/request-detail/request-detail.test.tsx`（FR-016、FR-017、FR-022～FR-026；SC-006～SC-008）
-- [ ] T039 [P] [US3] 创建或完善详情 query key、viewer 隔离、短 staleTime、窗口聚焦刷新和不可见错误映射，完成 `src/features/request-detail/request-detail.queries.ts`（FR-016、FR-023、FR-024、FR-028）
-- [ ] T040 [P] [US3] 完整实现申请人、负责审批人、资源、权限、期限、原因、直接可见的风险与状态、时间和审批记录的语义化展示；核心状态不得藏在折叠区域，创建或完善 `src/features/request-detail/RequestDetails.tsx`（FR-016、FR-017、FR-022、FR-026；SC-008）
-- [ ] T041 [US3] 完成详情页 Loading/不可用/Error/Success、重试、直达刷新和导航后焦点管理，使 T037/T038 通过，创建或完善 `src/pages/RequestDetailPage.tsx`、`src/app/router.tsx`（FR-016、FR-023～FR-026、FR-028；SC-006～SC-009）
+- [X] T037 [P] [US3] 为 Gateway 详情查询补充 requester/approver 可见、无关员工与未知 ID 同为 `NOT_FOUND`、Pending/Approved/Rejected 详情形状的集成测试，写入 `src/features/request-detail/request-detail.gateway.test.ts`（FR-016、FR-017、FR-028）
+- [X] T038 [P] [US3] 先编写详情页面集成测试，覆盖直达/重挂载、四态、全部字段、暂无审批记录、批准/拒绝记录、直接可见的状态与风险、无需展开即可识别的当前下一步、High Risk/最终状态/关键下一步的非颜色表达、重试和标题焦点，写入 `src/features/request-detail/request-detail.test.tsx`（FR-016、FR-017、FR-022～FR-026；SC-006～SC-008）
+- [X] T039 [P] [US3] 创建或完善详情 query key、viewer 隔离、短 staleTime、窗口聚焦刷新和不可见错误映射，完成 `src/features/request-detail/request-detail.queries.ts`（FR-016、FR-023、FR-024、FR-028）
+- [X] T040 [P] [US3] 完整实现申请人、负责审批人、资源、权限、期限、原因、直接可见的风险与状态、时间和审批记录的语义化展示；核心状态不得藏在折叠区域，创建或完善 `src/features/request-detail/RequestDetails.tsx`（FR-016、FR-017、FR-022、FR-026；SC-008）
+- [X] T041 [US3] 完成详情页 Loading/不可用/Error/Success、重试、直达刷新和导航后焦点管理，使 T037/T038 通过，创建或完善 `src/pages/RequestDetailPage.tsx`、`src/app/router.tsx`（FR-016、FR-023～FR-026、FR-028；SC-006～SC-009）
 
 **Checkpoint**：US3 可对 seed 中任意状态独立验证，详情 URL 刷新后保持同一申请且不会泄露不可见记录。
 

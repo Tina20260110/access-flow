@@ -201,10 +201,10 @@ describe('创建权限申请页面', () => {
     expect(
       screen.getByRole('heading', { name: '权限申请详情' }),
     ).toHaveFocus()
-    expect(screen.getByText('当前状态：待审批（Pending）')).toBeInTheDocument()
-    expect(screen.getByText('风险等级：高风险（High）')).toBeInTheDocument()
-    expect(screen.getByText('负责审批员工 ID：user-carol')).toBeInTheDocument()
-    expect(screen.getByText('申请版本：1')).toBeInTheDocument()
+    expect(screen.getByText('待审批（Pending）')).toBeInTheDocument()
+    expect(screen.getByText('高风险（High）')).toBeInTheDocument()
+    expect(screen.getByText('Carol Wang', { selector: 'dd' })).toBeInTheDocument()
+    expect(screen.getByText('1', { selector: 'dd' })).toBeInTheDocument()
     expect(createRequest).toHaveBeenCalledWith({
       actorId: 'user-bob',
       resourceId: 'resource-analytics',
@@ -216,7 +216,7 @@ describe('创建权限申请页面', () => {
     expect(createRequest.mock.calls[0]?.[0]).not.toHaveProperty('approverId')
     expect(createRequest.mock.calls[0]?.[0]).not.toHaveProperty('status')
     expect(createRequest.mock.calls[0]?.[0]).not.toHaveProperty('revision')
-    expect(getDetails).not.toHaveBeenCalled()
+    expect(getDetails).toHaveBeenCalledOnce()
 
     view.unmount()
     renderCreate({
@@ -224,8 +224,8 @@ describe('创建权限申请页面', () => {
       initialEntry: '/requests/request-created-by-contract',
       storedUserId: 'user-bob',
     })
-    expect(await screen.findByText('当前状态：待审批（Pending）')).toBeInTheDocument()
-    expect(getDetails).toHaveBeenCalledOnce()
+    expect(await screen.findByText('待审批（Pending）')).toBeInTheDocument()
+    expect(getDetails).toHaveBeenCalledTimes(2)
   })
 
   it('提交期间禁用按钮并阻止重复创建', async () => {
@@ -258,7 +258,7 @@ describe('创建权限申请页面', () => {
     await user.click(screen.getByRole('button', { name: '正在提交…' }))
     expect(createRequest).toHaveBeenCalledOnce()
     releaseCreate?.()
-    expect(await screen.findByText('当前状态：待审批（Pending）')).toBeInTheDocument()
+    expect(await screen.findByText('待审批（Pending）')).toBeInTheDocument()
   })
 
   it('瞬时失败不产生记录，保留输入并允许显式重试', async () => {
@@ -300,7 +300,7 @@ describe('创建权限申请页面', () => {
 
     await user.click(screen.getByRole('button', { name: '重新提交' }))
 
-    expect(await screen.findByText('当前状态：待审批（Pending）')).toBeInTheDocument()
+    expect(await screen.findByText('待审批（Pending）')).toBeInTheDocument()
     expect(
       await memoryGateway.getAccessRequest({
         requestId: accessRequestIdSchema.parse('request-created-by-contract'),
