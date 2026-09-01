@@ -77,12 +77,12 @@ Requester/Approver 只由单条申请的 `requesterId`/`approverId` 派生，且
 **独立测试**：用任一员工填写有效资源、权限、未来截止日期和原因后提交；验证进行中防重复、成功导航到新
 申请、`Pending`/风险/负责审批人正确，刷新后仍存在。分别验证空字段、空白原因、无映射、无候选与瞬时失败重试。
 
-- [ ] T025 [P] [US1] 先为创建表单 schema 编写单元测试，覆盖全部必填、trim、真实日期、截止日期晚于提交日和 command 类型输出，写入 `src/features/request-create/create-request.schema.test.ts`（FR-010、FR-011、FR-015、FR-030）
-- [ ] T026 [P] [US1] 先编写创建页面集成测试，覆盖任一员工在不离开创建页面配置额外信息的连续表单流程、目录四态、字段错误关联、提交 pending/防重复、失败保值与重试、成功立即导航详情并确认 `Pending`，以及 risk/approver 由 Gateway 返回，写入 `src/features/request-create/create-request.test.tsx`（FR-010～FR-015、FR-023～FR-026、FR-030；SC-002、SC-006）
-- [ ] T027 [P] [US1] 实现 React Hook Form 使用的 Zod 创建 schema，使 T025 通过，完成 `src/features/request-create/create-request.schema.ts`（FR-010、FR-011）
-- [ ] T028 [P] [US1] 实现使用较长 `staleTime` 的 Resource Catalog query、创建 mutation、成功详情缓存填充与列表失效，并提供新申请详情的初始 query hook；沿用 T024 的 `networkMode: 'always'` 且不得把 Query cache 当作持久化来源，完成 `src/features/request-create/create-request.queries.ts`、`src/features/request-detail/request-detail.queries.ts`（FR-012、FR-013、FR-023、FR-024、FR-028）
-- [ ] T029 [US1] 实现具有真实 label、错误关联、首错聚焦、提交状态和保值重试的创建表单，使 T026 的交互断言通过，完成 `src/features/request-create/CreateRequestForm.tsx`（FR-010～FR-012、FR-023～FR-026）
-- [ ] T030 [US1] 组装无需离开页面执行额外配置的 `/requests/new` 连续表单流程，并在成功后立即导航 `/requests/:requestId`，直接显示可刷新恢复的 `Pending` 确认信息，完成 `src/pages/CreateRequestPage.tsx`、`src/pages/RequestDetailPage.tsx`、`src/features/request-detail/RequestDetails.tsx`、`src/app/router.tsx`（FR-013、FR-016、FR-023～FR-026、FR-028；SC-002、SC-009）
+- [X] T025 [P] [US1] 先为创建表单 schema 编写单元测试，覆盖全部必填、trim、真实日期、截止日期晚于提交日和 command 类型输出，写入 `src/features/request-create/create-request.schema.test.ts`（FR-010、FR-011、FR-015、FR-030）
+- [X] T026 [P] [US1] 先编写创建页面集成测试，覆盖任一员工在不离开创建页面配置额外信息的连续表单流程、目录四态、字段错误关联、提交 pending/防重复、失败保值与重试、成功立即导航详情并确认 `Pending`，以及 risk/approver 由 Gateway 返回，写入 `src/features/request-create/create-request.test.tsx`（FR-010～FR-015、FR-023～FR-026、FR-030；SC-002、SC-006）
+- [X] T027 [P] [US1] 实现 React Hook Form 使用的 Zod 创建 schema，使 T025 通过，完成 `src/features/request-create/create-request.schema.ts`（FR-010、FR-011）
+- [X] T028 [P] [US1] 实现使用较长 `staleTime` 的 Resource Catalog query、创建 mutation、成功详情缓存填充与列表失效，并提供新申请详情的初始 query hook；沿用 T024 的 `networkMode: 'always'` 且不得把 Query cache 当作持久化来源，完成 `src/features/request-create/create-request.queries.ts`、`src/features/request-detail/request-detail.queries.ts`（FR-012、FR-013、FR-023、FR-024、FR-028）
+- [X] T029 [US1] 实现具有真实 label、错误关联、首错聚焦、提交状态和保值重试的创建表单，使 T026 的交互断言通过，完成 `src/features/request-create/CreateRequestForm.tsx`（FR-010～FR-012、FR-023～FR-026）
+- [X] T030 [US1] 组装无需离开页面执行额外配置的 `/requests/new` 连续表单流程，并在成功后立即导航 `/requests/:requestId`，直接显示可刷新恢复的 `Pending` 确认信息，完成 `src/pages/CreateRequestPage.tsx`、`src/pages/RequestDetailPage.tsx`、`src/features/request-detail/RequestDetails.tsx`、`src/app/router.tsx`（FR-013、FR-016、FR-023～FR-026、FR-028；SC-002、SC-009）
 
 **Checkpoint**：US1 可独立演示和验证；用户无需列表或审批即可创建并重新打开一条有效 Pending 申请。
 

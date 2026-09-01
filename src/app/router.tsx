@@ -7,6 +7,8 @@ import {
 } from 'react-router-dom'
 
 import { NotFoundPage } from '../pages/NotFoundPage'
+import { CreateRequestPage } from '../pages/CreateRequestPage'
+import { RequestDetailPage } from '../pages/RequestDetailPage'
 import { AppShell } from './AppShell'
 
 type RoutePlaceholderProps = Readonly<{
@@ -41,21 +43,11 @@ export function AccessFlowRoutes(): ReactElement {
           path="requests"
         />
         <Route
-          element={
-            <RoutePlaceholder
-              description="创建业务界面将在对应用户故事任务中实现。"
-              title="创建权限申请"
-            />
-          }
+          element={<CreateRequestPage />}
           path="requests/new"
         />
         <Route
-          element={
-            <RoutePlaceholder
-              description="详情与审批业务界面将在对应用户故事任务中实现。"
-              title="权限申请详情"
-            />
-          }
+          element={<RequestDetailPage />}
           path="requests/:requestId"
         />
         <Route element={<NotFoundPage />} path="*" />

@@ -5,11 +5,21 @@ import {
 } from '@tanstack/react-query'
 
 import type { AccessFlowGateway } from '../data/access-flow-gateway'
+import type {
+  AccessRequestId,
+  DemoUserId,
+} from '../domain/models'
 import { useAccessFlowGateway } from './access-flow-context'
 
 export const accessFlowQueryKeys = {
   demoUsers: ['demoUsers'] as const,
   resources: ['resources'] as const,
+  accessRequests: {
+    all: ['accessRequests'] as const,
+    lists: () => ['accessRequests', 'list'] as const,
+    detail: (requestId: AccessRequestId, viewerId: DemoUserId) =>
+      ['accessRequests', 'detail', requestId, viewerId] as const,
+  },
 }
 
 export const DIRECTORY_STALE_TIME = Infinity
@@ -43,6 +53,7 @@ export function resourceCatalogQueryOptions(gateway: AccessFlowGateway) {
     queryKey: accessFlowQueryKeys.resources,
     queryFn: () => gateway.getResources(),
     networkMode: 'always',
+    retry: false,
     staleTime: DIRECTORY_STALE_TIME,
   })
 }
