@@ -8,6 +8,7 @@ import type { AccessFlowGateway } from '../data/access-flow-gateway'
 import type {
   AccessRequestId,
   DemoUserId,
+  ListQueryState,
 } from '../domain/models'
 import { useAccessFlowGateway } from './access-flow-context'
 
@@ -17,6 +18,18 @@ export const accessFlowQueryKeys = {
   accessRequests: {
     all: ['accessRequests'] as const,
     lists: () => ['accessRequests', 'list'] as const,
+    list: (viewerId: DemoUserId, query: ListQueryState) =>
+      [
+        'accessRequests',
+        'list',
+        viewerId,
+        {
+          search: query.search,
+          status: query.status,
+          riskLevel: query.riskLevel,
+          page: query.page,
+        },
+      ] as const,
     detail: (requestId: AccessRequestId, viewerId: DemoUserId) =>
       ['accessRequests', 'detail', requestId, viewerId] as const,
   },

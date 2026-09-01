@@ -98,12 +98,12 @@ SC-003、SC-004、SC-006、SC-007。
 **独立测试**：从包含不同申请人、资源、状态与风险的 seed 进入 `/requests`，验证关系可见并集、搜索/筛选/
 分页、两类 Empty、错误重试、身份切换、刷新/前进后退/复制 URL 恢复及无效参数规范化。
 
-- [ ] T031 [P] [US2] 为 Gateway 列表语义增加针对关系并集去重、名称部分匹配、组合筛选、稳定排序、固定分页与越界页回退的集成测试，写入 `src/features/request-list/request-list.gateway.test.ts`（FR-002、FR-004～FR-009）
-- [ ] T032 [P] [US2] 先编写列表页面集成测试，覆盖 URL 重挂载/前进后退、搜索或筛选重置 page、身份切换、更新时保留结果、两类 Empty、错误重试、语义 table/nav 和 High Risk 非颜色提示，写入 `src/features/request-list/request-list.test.tsx`（FR-002、FR-004～FR-009、FR-022～FR-027；SC-004、SC-006、SC-007）
-- [ ] T033 [P] [US2] 实现包含 viewerId 与规范 query 的稳定 query key、短 staleTime、一次 transient retry 和保留前页结果的列表 query hook，完成 `src/features/request-list/request-list.queries.ts`（FR-002、FR-023、FR-024）
-- [ ] T034 [P] [US2] 实现搜索草稿提交、状态/风险筛选、分页控件、语义表格及文字化风险/状态提示，完成 `src/features/request-list/RequestFilters.tsx`、`src/features/request-list/RequestTable.tsx`、`src/components/RiskBadge.tsx`、`src/components/StatusBadge.tsx`（FR-004～FR-007、FR-022、FR-025、FR-026）
-- [ ] T035 [US2] 组装 `/requests` 页面，以 URL 为已提交查询唯一来源，处理规范 replace/history、越界页、Loading/Empty/Error/Success 和身份切换后的重新查询，使 T031/T032 通过，完成 `src/pages/RequestListPage.tsx`、`src/app/router.tsx`（FR-002、FR-005～FR-009、FR-023～FR-028；SC-004、SC-006）
-- [ ] T036 [US2] 使用至少 1,000 条 fixture 添加 jsdom 代表性规模正确性测试，验证搜索、组合筛选、稳定排序和分页行为并发现明显算法问题；不得以 jsdom 墙钟时间作为 SC-003 的正式 2 秒验收，完成 `src/features/request-list/request-list.scale.test.tsx`、`src/test/fixtures.ts`（FR-005～FR-007；SC-003 的正式验收见 T052；Constitution VIII）
+- [X] T031 [P] [US2] 为 Gateway 列表语义增加针对关系并集去重、名称部分匹配、组合筛选、稳定排序、固定分页与越界页回退的集成测试，写入 `src/features/request-list/request-list.gateway.test.ts`（FR-002、FR-004～FR-009）
+- [X] T032 [P] [US2] 先编写列表页面集成测试，覆盖 URL 重挂载/前进后退、搜索或筛选重置 page、身份切换、更新时保留结果、两类 Empty、错误重试、语义 table/nav 和 High Risk 非颜色提示，写入 `src/features/request-list/request-list.test.tsx`（FR-002、FR-004～FR-009、FR-022～FR-027；SC-004、SC-006、SC-007）
+- [X] T033 [P] [US2] 实现包含 viewerId 与规范 query 的稳定 query key、短 staleTime、一次 transient retry 和保留前页结果的列表 query hook，完成 `src/features/request-list/request-list.queries.ts`（FR-002、FR-023、FR-024）
+- [X] T034 [P] [US2] 实现搜索草稿提交、状态/风险筛选、分页控件、语义表格及文字化风险/状态提示，完成 `src/features/request-list/RequestFilters.tsx`、`src/features/request-list/RequestTable.tsx`、`src/components/RiskBadge.tsx`、`src/components/StatusBadge.tsx`（FR-004～FR-007、FR-022、FR-025、FR-026）
+- [X] T035 [US2] 组装 `/requests` 页面，以 URL 为已提交查询唯一来源，处理规范 replace/history、越界页、Loading/Empty/Error/Success 和身份切换后的重新查询，使 T031/T032 通过，完成 `src/pages/RequestListPage.tsx`、`src/app/router.tsx`（FR-002、FR-005～FR-009、FR-023～FR-028；SC-004、SC-006）
+- [X] T036 [US2] 使用至少 1,000 条 fixture 添加 jsdom 代表性规模正确性测试，验证搜索、组合筛选、稳定排序和分页行为并发现明显算法问题；不得以 jsdom 墙钟时间作为 SC-003 的正式 2 秒验收，完成 `src/features/request-list/request-list.scale.test.tsx`、`src/test/fixtures.ts`（FR-005～FR-007；SC-003 的正式验收见 T052；Constitution VIII）
 
 **Checkpoint**：US2 可仅依靠 seed 独立验证，复制任何规范列表 URL 都能恢复相同查询含义。
 
