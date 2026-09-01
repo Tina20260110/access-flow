@@ -50,15 +50,15 @@ Requester/Approver 只由单条申请的 `requesterId`/`approverId` 派生，且
 - [X] T011 实现风险查找和审批候选分配纯函数，使 T007 通过，完成 `src/domain/request-rules.ts`；风险和 `approverId` 均不得由 UI 提供默认值（FR-014、FR-015、FR-030）
 - [X] T012 实现共享纯函数 `canDecideRequest`/`canApproveRequest`，并让只接受合法判别联合与 `expectedRevision` 的批准/拒绝状态转换复用这些资格规则，使 T008 通过，完成 `src/domain/request-transitions.ts`（FR-018～FR-021、FR-029；SC-005）
 - [X] T013 实现无 React 依赖的 `parseListQuery`、`serializeListQuery` 和查询更新 helpers；重复单值参数必须取第一个并通过 replace 规范化为单值，第一个值无效时不得改用后续值，使 T009 通过，完成 `src/features/request-list/list-query-state.ts`（FR-005～FR-008、FR-027；SC-004）
-- [ ] T014 按数据访问契约定义异步 `AccessFlowGateway`、显式 actor/viewer 输入、查询详情/摘要返回类型与 cache-neutral 错误语义，完成 `src/data/access-flow-gateway.ts`（FR-002、FR-013、FR-016～FR-021、FR-028～FR-030）
-- [ ] T015 [P] 先为确定性 seed 编写失败测试，验证三种状态/风险、有效引用、每个资源至少两名不同候选员工、无永久角色和 `requesterId !== approverId`，写入 `src/data/seed-data.test.ts`（FR-001、FR-003、FR-014、FR-028、FR-030）
-- [ ] T016 [P] 先为当前 Demo 用户 ID 偏好边界编写失败测试，覆盖合法恢复、未知 ID 回退、损坏 localStorage 和重置默认身份，写入 `src/data/demo-preferences.test.ts`（FR-001、FR-028）
-- [ ] T017 [P] 实现经 schema 校验的 `createSeedState(today)` 和默认员工 ID，使 T015 通过，完成 `src/data/seed-data.ts`；不得创建 Admin、RBAC 或仅能自审批的资源分配（FR-001、FR-028、FR-030）
-- [ ] T018 [P] 实现仅持久化并校验 `currentDemoUserId` 的小型偏好 adapter，使 T016 通过，完成 `src/data/demo-preferences.ts`（Plan：唯一 global client state；FR-001、FR-028）
-- [ ] T019 以 contract-first 方式编写可复用 Gateway 行为测试，覆盖目录、关系可见并集、稳定搜索/筛选/分页、详情防泄露、创建、批准、拒绝、冲突、失败不留部分写入和重置，完成 `src/test/gateway-contract.ts`、`src/test/memory-gateway.test.ts`（FR-002～FR-021、FR-028～FR-030）
-- [ ] T020 [P] 实现供 unit/integration tests 注入的内存 Gateway，使 T019 的完整契约测试通过，完成 `src/test/memory-gateway.ts`（Plan：测试 adapter；FR-002～FR-021、FR-028～FR-030）
-- [ ] T021 [P] 实现单 `demo-state` store、单 versioned document 的 IndexedDB Gateway，所有读取/返回均经 Zod 校验；创建与审批在 `readwrite` 事务中基于最新记录验证 revision，并调用 T012 的共享领域资格与转换规则，完成 `src/data/indexed-db-gateway.ts`（FR-013、FR-018～FR-021、FR-028～FR-030；SC-005、SC-009）
-- [ ] T022 实现固定人工延迟、测试环境可配置零延迟和确定性下一次失败的 Gateway decorator，并验证延迟与故障均发生在 IndexedDB 事务之外且失败不改变数据，完成 `src/data/demo-transport.ts`、`src/data/demo-transport.test.ts`（FR-012、FR-021、FR-023、FR-024）
+- [X] T014 按数据访问契约定义异步 `AccessFlowGateway`、显式 actor/viewer 输入、查询详情/摘要返回类型与 cache-neutral 错误语义，完成 `src/data/access-flow-gateway.ts`（FR-002、FR-013、FR-016～FR-021、FR-028～FR-030）
+- [X] T015 [P] 先为确定性 seed 编写失败测试，验证三种状态/风险、有效引用、每个资源至少两名不同候选员工、无永久角色和 `requesterId !== approverId`，写入 `src/data/seed-data.test.ts`（FR-001、FR-003、FR-014、FR-028、FR-030）
+- [X] T016 [P] 先为当前 Demo 用户 ID 偏好边界编写失败测试，覆盖合法恢复、未知 ID 回退、损坏 localStorage 和重置默认身份，写入 `src/data/demo-preferences.test.ts`（FR-001、FR-028）
+- [X] T017 [P] 实现经 schema 校验的 `createSeedState(today)` 和默认员工 ID，使 T015 通过，完成 `src/data/seed-data.ts`；不得创建 Admin、RBAC 或仅能自审批的资源分配（FR-001、FR-028、FR-030）
+- [X] T018 [P] 实现仅持久化并校验 `currentDemoUserId` 的小型偏好 adapter，使 T016 通过，完成 `src/data/demo-preferences.ts`（Plan：唯一 global client state；FR-001、FR-028）
+- [X] T019 以 contract-first 方式编写可复用 Gateway 行为测试，覆盖目录、关系可见并集、稳定搜索/筛选/分页、详情防泄露、创建、批准、拒绝、冲突、失败不留部分写入和重置，完成 `src/test/gateway-contract.ts`、`src/test/memory-gateway.test.ts`（FR-002～FR-021、FR-028～FR-030）
+- [X] T020 [P] 实现供 unit/integration tests 注入的内存 Gateway，使 T019 的完整契约测试通过，完成 `src/test/memory-gateway.ts`（Plan：测试 adapter；FR-002～FR-021、FR-028～FR-030）
+- [X] T021 [P] 实现单 `demo-state` store、单 versioned document 的 IndexedDB Gateway，所有读取/返回均经 Zod 校验；创建与审批在 `readwrite` 事务中基于最新记录验证 revision，并调用 T012 的共享领域资格与转换规则，完成 `src/data/indexed-db-gateway.ts`（FR-013、FR-018～FR-021、FR-028～FR-030；SC-005、SC-009）
+- [X] T022 实现固定人工延迟、测试环境可配置零延迟和确定性下一次失败的 Gateway decorator，并验证延迟与故障均发生在 IndexedDB 事务之外且失败不改变数据，完成 `src/data/demo-transport.ts`、`src/data/demo-transport.test.ts`（FR-012、FR-021、FR-023、FR-024）
 - [ ] T023 [P] 先为根级 providers 与 Demo 身份行为编写集成测试，覆盖 current ID 派生、身份切换、未知偏好回退、无永久角色门禁以及切换后 viewer query 变化，写入 `src/features/demo-identity/demo-identity.test.tsx`（FR-001、FR-002、FR-028）
 - [ ] T024 建立 QueryClient/Gateway 注入，为所有基于本地 `AccessFlowGateway` 的 query/mutation 配置 `networkMode: 'always'`，为 Demo Users query 配置较长 `staleTime`，并明确 Query cache 不作为持久化事实来源；实现仅保存 current user ID 的 DemoIdentity Context、身份切换器、AppShell、路由骨架与中文 NotFound，使 T023 通过，完成 `src/app/providers.tsx`、`src/features/demo-identity/DemoIdentityProvider.tsx`、`src/features/demo-identity/DemoUserSwitcher.tsx`、`src/app/AppShell.tsx`、`src/app/router.tsx`、`src/pages/NotFoundPage.tsx`、`src/main.tsx`（FR-001、FR-002、FR-023～FR-026、FR-028）
 
