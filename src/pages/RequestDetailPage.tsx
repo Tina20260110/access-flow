@@ -5,6 +5,7 @@ import { z } from 'zod'
 import type { AccessRequestId } from '../domain/models'
 import { accessRequestIdSchema } from '../domain/schemas'
 import { useDemoIdentity } from '../features/demo-identity/demo-identity-context'
+import { ApprovalPanel } from '../features/request-detail/ApprovalPanel'
 import { RequestDetails } from '../features/request-detail/RequestDetails'
 import {
   getRequestDetailErrorKind,
@@ -65,7 +66,15 @@ function ResolvedRequestDetailPage({
     )
   }
 
-  return <RequestDetails details={requestQuery.data} />
+  return (
+    <>
+      <RequestDetails details={requestQuery.data} />
+      <ApprovalPanel
+        actorId={currentDemoUserId}
+        request={requestQuery.data.request}
+      />
+    </>
+  )
 }
 
 export function RequestDetailPage(): ReactElement {

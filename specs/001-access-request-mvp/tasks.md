@@ -139,12 +139,12 @@ SC-001、SC-005～SC-009。
 **独立测试**：准备两条 Pending，负责审批人分别批准和带原因拒绝；验证申请人/无关员工/自审批均无操作权、
 空白原因失败、过期批准失败、重复点击受控、瞬时失败可重试、两个 stale revision 只有首个成功。
 
-- [ ] T042 [P] [US4] 先为拒绝表单 Zod schema 编写单元测试，覆盖 trim 后非空、错误消息和 command 输出，写入 `src/features/request-detail/reject-request.schema.test.ts`（FR-020、FR-026）
-- [ ] T043 [P] [US4] 先编写审批集成测试，覆盖关系资格、批准、拒绝必填、过期批准、终态隐藏操作、重复点击、transient 重试、stale conflict 重取与焦点提示，写入 `src/features/request-detail/approval-flow.test.tsx`（FR-018～FR-021、FR-023～FR-026、FR-029；SC-005、SC-006）
-- [ ] T044 [P] [US4] 实现拒绝表单 schema，使 T042 通过，完成 `src/features/request-detail/reject-request.schema.ts`（FR-020）
-- [ ] T045 [P] [US4] 实现保守 approve/reject mutations：command 必须携带 `expectedRevision`，不自动重试、不 optimistic update；当前页面成功后更新详情并失效列表，收到 `CONFLICT` 后主动 refetch 最新详情和列表，完成 `src/features/request-detail/request-detail.queries.ts`（FR-018～FR-021、FR-023、FR-024、FR-029）
-- [ ] T046 [US4] 实现直接展示当前关键下一步的审批面板和可键盘关闭/恢复焦点的拒绝对话框；`ApprovalPanel` 只能调用 T012 的共享 domain capability predicates 决定操作显示或启用，不得复制 Pending、负责人、禁止自审批或期限判断，也不得读取永久角色，Gateway/transition 仍负责最终校验，完成 `src/features/request-detail/ApprovalPanel.tsx`、`src/features/request-detail/RejectDialog.tsx`（FR-018、FR-020、FR-021、FR-025、FR-026、FR-029；SC-008）
-- [ ] T047 [US4] 将审批区接入详情页，处理 mutation pending、成功播报、失败保值重试、过期提示和 conflict 聚焦，使 T043 通过，扩展 `src/pages/RequestDetailPage.tsx`（FR-018～FR-021、FR-023～FR-026、FR-029；SC-005、SC-006）
+- [X] T042 [P] [US4] 先为拒绝表单 Zod schema 编写单元测试，覆盖 trim 后非空、错误消息和 command 输出，写入 `src/features/request-detail/reject-request.schema.test.ts`（FR-020、FR-026）
+- [X] T043 [P] [US4] 先编写审批集成测试，覆盖关系资格、批准、拒绝必填、过期批准、终态隐藏操作、重复点击、transient 重试、stale conflict 重取与焦点提示，写入 `src/features/request-detail/approval-flow.test.tsx`（FR-018～FR-021、FR-023～FR-026、FR-029；SC-005、SC-006）
+- [X] T044 [P] [US4] 实现拒绝表单 schema，使 T042 通过，完成 `src/features/request-detail/reject-request.schema.ts`（FR-020）
+- [X] T045 [P] [US4] 实现保守 approve/reject mutations：command 必须携带 `expectedRevision`，不自动重试、不 optimistic update；当前页面成功后更新详情并失效列表，收到 `CONFLICT` 后主动 refetch 最新详情和列表，完成 `src/features/request-detail/request-detail.queries.ts`（FR-018～FR-021、FR-023、FR-024、FR-029）
+- [X] T046 [US4] 实现直接展示当前关键下一步的审批面板和可键盘关闭/恢复焦点的拒绝对话框；`ApprovalPanel` 只能调用 T012 的共享 domain capability predicates 决定操作显示或启用，不得复制 Pending、负责人、禁止自审批或期限判断，也不得读取永久角色，Gateway/transition 仍负责最终校验，完成 `src/features/request-detail/ApprovalPanel.tsx`、`src/features/request-detail/RejectDialog.tsx`（FR-018、FR-020、FR-021、FR-025、FR-026、FR-029；SC-008）
+- [X] T047 [US4] 将审批区接入详情页，处理 mutation pending、成功播报、失败保值重试、过期提示和 conflict 聚焦，使 T043 通过，扩展 `src/pages/RequestDetailPage.tsx`（FR-018～FR-021、FR-023～FR-026、FR-029；SC-005、SC-006）
 
 **Checkpoint**：US4 独立通过批准与拒绝验收；业务闭环 US1→US2→US3→US4 已完整，终态不能被第二次决定覆盖。
 
