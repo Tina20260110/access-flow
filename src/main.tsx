@@ -1,7 +1,18 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 
+import { AppRouter } from './app/router'
+import { AccessFlowProviders } from './app/providers'
+import { createAccessFlowQueryClient } from './app/query-client'
+import { DemoPreferencesAdapter } from './data/demo-preferences'
+import { DemoTransport } from './data/demo-transport'
+import { IndexedDbAccessFlowGateway } from './data/indexed-db-gateway'
+import { DemoIdentityProvider } from './features/demo-identity/DemoIdentityProvider'
 import './index.css'
+
+const gateway = new DemoTransport(new IndexedDbAccessFlowGateway())
+const queryClient = createAccessFlowQueryClient()
+const preferences = new DemoPreferencesAdapter(window.localStorage)
 
 const rootElement = document.getElementById('root')
 
@@ -11,11 +22,10 @@ if (rootElement === null) {
 
 createRoot(rootElement).render(
   <StrictMode>
-    <main className="mx-auto flex min-h-screen max-w-5xl items-center px-6 py-12">
-      <div>
-        <h1 className="text-3xl font-semibold tracking-tight">AccessFlow</h1>
-        <p className="mt-3 text-slate-600">工程基础设施已就绪。</p>
-      </div>
-    </main>
+    <AccessFlowProviders gateway={gateway} queryClient={queryClient}>
+      <DemoIdentityProvider preferences={preferences}>
+        <AppRouter />
+      </DemoIdentityProvider>
+    </AccessFlowProviders>
   </StrictMode>,
 )

@@ -59,8 +59,8 @@ Requester/Approver 只由单条申请的 `requesterId`/`approverId` 派生，且
 - [X] T020 [P] 实现供 unit/integration tests 注入的内存 Gateway，使 T019 的完整契约测试通过，完成 `src/test/memory-gateway.ts`（Plan：测试 adapter；FR-002～FR-021、FR-028～FR-030）
 - [X] T021 [P] 实现单 `demo-state` store、单 versioned document 的 IndexedDB Gateway，所有读取/返回均经 Zod 校验；创建与审批在 `readwrite` 事务中基于最新记录验证 revision，并调用 T012 的共享领域资格与转换规则，完成 `src/data/indexed-db-gateway.ts`（FR-013、FR-018～FR-021、FR-028～FR-030；SC-005、SC-009）
 - [X] T022 实现固定人工延迟、测试环境可配置零延迟和确定性下一次失败的 Gateway decorator，并验证延迟与故障均发生在 IndexedDB 事务之外且失败不改变数据，完成 `src/data/demo-transport.ts`、`src/data/demo-transport.test.ts`（FR-012、FR-021、FR-023、FR-024）
-- [ ] T023 [P] 先为根级 providers 与 Demo 身份行为编写集成测试，覆盖 current ID 派生、身份切换、未知偏好回退、无永久角色门禁以及切换后 viewer query 变化，写入 `src/features/demo-identity/demo-identity.test.tsx`（FR-001、FR-002、FR-028）
-- [ ] T024 建立 QueryClient/Gateway 注入，为所有基于本地 `AccessFlowGateway` 的 query/mutation 配置 `networkMode: 'always'`，为 Demo Users query 配置较长 `staleTime`，并明确 Query cache 不作为持久化事实来源；实现仅保存 current user ID 的 DemoIdentity Context、身份切换器、AppShell、路由骨架与中文 NotFound，使 T023 通过，完成 `src/app/providers.tsx`、`src/features/demo-identity/DemoIdentityProvider.tsx`、`src/features/demo-identity/DemoUserSwitcher.tsx`、`src/app/AppShell.tsx`、`src/app/router.tsx`、`src/pages/NotFoundPage.tsx`、`src/main.tsx`（FR-001、FR-002、FR-023～FR-026、FR-028）
+- [X] T023 [P] 先为根级 providers 与 Demo 身份行为编写集成测试，覆盖 current ID 派生、身份切换、未知偏好回退、无永久角色门禁以及切换后 viewer query 变化，写入 `src/features/demo-identity/demo-identity.test.tsx`（FR-001、FR-002、FR-028）
+- [X] T024 建立 QueryClient/Gateway 注入，为所有基于本地 `AccessFlowGateway` 的 query/mutation 配置 `networkMode: 'always'`，为 Demo Users query 配置较长 `staleTime`，并明确 Query cache 不作为持久化事实来源；实现仅保存 current user ID 的 DemoIdentity Context、身份切换器、AppShell、路由骨架与中文 NotFound，使 T023 通过，完成 `src/app/providers.tsx`、`src/features/demo-identity/DemoIdentityProvider.tsx`、`src/features/demo-identity/DemoUserSwitcher.tsx`、`src/app/AppShell.tsx`、`src/app/router.tsx`、`src/pages/NotFoundPage.tsx`、`src/main.tsx`（FR-001、FR-002、FR-023～FR-026、FR-028）
 
 **Checkpoint**：全部纯逻辑与 memory Gateway contract tests 通过；浏览器首次打开可校验 seed、初始化 IndexedDB、
 切换员工身份。此后任何用户故事 UI 只能依赖 Gateway/query hooks。
