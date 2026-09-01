@@ -41,15 +41,15 @@ IndexedDB 持久化、Demo 身份基础设施和应用壳。
 **关键门禁**：`DemoUser` 只能包含员工基础身份；不得出现永久 Requester/Approver/Admin/RBAC 字段。
 Requester/Approver 只由单条申请的 `requesterId`/`approverId` 派生，且二者必须不同。
 
-- [ ] T005 建立 branded IDs、`DemoUser`、`Resource`、`Permission`、`AccessRequest` 状态判别联合、commands/page types 与稳定领域错误码，完成 `src/domain/models.ts`、`src/domain/errors.ts`；明确无 `roles`，并编码 `requesterId !== approverId`（FR-001、FR-003、FR-013～FR-021、FR-030）
-- [ ] T006 [P] 先为 branded 值、日期、`DemoUser`、资源目录、三种申请联合、审批记录和 `PersistedDemoState` 编写失败的 Zod 边界测试，覆盖未知 schemaVersion、损坏引用、非法状态、自审批和候选员工不足，写入 `src/domain/schemas.test.ts`（FR-001、FR-003、FR-014、FR-017～FR-021、FR-028～FR-030）
-- [ ] T007 [P] 先为资源权限精确风险映射和 `approverCandidateIds` 顺序分配编写失败的纯逻辑测试，覆盖未映射组合、跳过申请人及无合格候选员工，写入 `src/domain/request-rules.test.ts`（FR-014、FR-015、FR-030）
-- [ ] T008 [P] 先为共享纯函数 `canDecideRequest`/`canApproveRequest` 及 `Pending → Approved/Rejected` 状态转换编写失败测试，覆盖 Pending、负责人关系、禁止自审批、到期只能拒绝、空白拒绝原因、终态重复处理和 stale revision，并验证 transition 复用同一资格规则，写入 `src/domain/request-transitions.test.ts`（FR-018～FR-021、FR-029；SC-005）
-- [ ] T009 [P] 先为 `q/status/risk/page` 的 Zod 解析、规范序列化、默认值省略、坏参数独立回退、查询变化重置 page 编写失败测试；必须覆盖合法重复参数采用第一个值、第一个值无效但后续值合法时仍按 invalid fallback、以及 parse → canonical serialize 的确定性结果，写入 `src/features/request-list/list-query-state.test.ts`（FR-005～FR-008、FR-027；SC-004）
-- [ ] T010 实现外部数据进入可信领域层所需的完整 Zod schema、品牌值解析和根级关系校验，使 T006 通过，完成 `src/domain/schemas.ts`（Constitution I；FR-001、FR-003、FR-014、FR-017～FR-021、FR-028～FR-030）
-- [ ] T011 实现风险查找和审批候选分配纯函数，使 T007 通过，完成 `src/domain/request-rules.ts`；风险和 `approverId` 均不得由 UI 提供默认值（FR-014、FR-015、FR-030）
-- [ ] T012 实现共享纯函数 `canDecideRequest`/`canApproveRequest`，并让只接受合法判别联合与 `expectedRevision` 的批准/拒绝状态转换复用这些资格规则，使 T008 通过，完成 `src/domain/request-transitions.ts`（FR-018～FR-021、FR-029；SC-005）
-- [ ] T013 实现无 React 依赖的 `parseListQuery`、`serializeListQuery` 和查询更新 helpers；重复单值参数必须取第一个并通过 replace 规范化为单值，第一个值无效时不得改用后续值，使 T009 通过，完成 `src/features/request-list/list-query-state.ts`（FR-005～FR-008、FR-027；SC-004）
+- [X] T005 建立 branded IDs、`DemoUser`、`Resource`、`Permission`、`AccessRequest` 状态判别联合、commands/page types 与稳定领域错误码，完成 `src/domain/models.ts`、`src/domain/errors.ts`；明确无 `roles`，并编码 `requesterId !== approverId`（FR-001、FR-003、FR-013～FR-021、FR-030）
+- [X] T006 [P] 先为 branded 值、日期、`DemoUser`、资源目录、三种申请联合、审批记录和 `PersistedDemoState` 编写失败的 Zod 边界测试，覆盖未知 schemaVersion、损坏引用、非法状态、自审批和候选员工不足，写入 `src/domain/schemas.test.ts`（FR-001、FR-003、FR-014、FR-017～FR-021、FR-028～FR-030）
+- [X] T007 [P] 先为资源权限精确风险映射和 `approverCandidateIds` 顺序分配编写失败的纯逻辑测试，覆盖未映射组合、跳过申请人及无合格候选员工，写入 `src/domain/request-rules.test.ts`（FR-014、FR-015、FR-030）
+- [X] T008 [P] 先为共享纯函数 `canDecideRequest`/`canApproveRequest` 及 `Pending → Approved/Rejected` 状态转换编写失败测试，覆盖 Pending、负责人关系、禁止自审批、到期只能拒绝、空白拒绝原因、终态重复处理和 stale revision，并验证 transition 复用同一资格规则，写入 `src/domain/request-transitions.test.ts`（FR-018～FR-021、FR-029；SC-005）
+- [X] T009 [P] 先为 `q/status/risk/page` 的 Zod 解析、规范序列化、默认值省略、坏参数独立回退、查询变化重置 page 编写失败测试；必须覆盖合法重复参数采用第一个值、第一个值无效但后续值合法时仍按 invalid fallback、以及 parse → canonical serialize 的确定性结果，写入 `src/features/request-list/list-query-state.test.ts`（FR-005～FR-008、FR-027；SC-004）
+- [X] T010 实现外部数据进入可信领域层所需的完整 Zod schema、品牌值解析和根级关系校验，使 T006 通过，完成 `src/domain/schemas.ts`（Constitution I；FR-001、FR-003、FR-014、FR-017～FR-021、FR-028～FR-030）
+- [X] T011 实现风险查找和审批候选分配纯函数，使 T007 通过，完成 `src/domain/request-rules.ts`；风险和 `approverId` 均不得由 UI 提供默认值（FR-014、FR-015、FR-030）
+- [X] T012 实现共享纯函数 `canDecideRequest`/`canApproveRequest`，并让只接受合法判别联合与 `expectedRevision` 的批准/拒绝状态转换复用这些资格规则，使 T008 通过，完成 `src/domain/request-transitions.ts`（FR-018～FR-021、FR-029；SC-005）
+- [X] T013 实现无 React 依赖的 `parseListQuery`、`serializeListQuery` 和查询更新 helpers；重复单值参数必须取第一个并通过 replace 规范化为单值，第一个值无效时不得改用后续值，使 T009 通过，完成 `src/features/request-list/list-query-state.ts`（FR-005～FR-008、FR-027；SC-004）
 - [ ] T014 按数据访问契约定义异步 `AccessFlowGateway`、显式 actor/viewer 输入、查询详情/摘要返回类型与 cache-neutral 错误语义，完成 `src/data/access-flow-gateway.ts`（FR-002、FR-013、FR-016～FR-021、FR-028～FR-030）
 - [ ] T015 [P] 先为确定性 seed 编写失败测试，验证三种状态/风险、有效引用、每个资源至少两名不同候选员工、无永久角色和 `requesterId !== approverId`，写入 `src/data/seed-data.test.ts`（FR-001、FR-003、FR-014、FR-028、FR-030）
 - [ ] T016 [P] 先为当前 Demo 用户 ID 偏好边界编写失败测试，覆盖合法恢复、未知 ID 回退、损坏 localStorage 和重置默认身份，写入 `src/data/demo-preferences.test.ts`（FR-001、FR-028）
