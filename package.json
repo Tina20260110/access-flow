@@ -15,7 +15,8 @@
     "lint": "eslint . --max-warnings 0",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:e2e": "playwright test --pass-with-no-tests"
+    "test:e2e": "playwright test --pass-with-no-tests",
+    "test:e2e:performance": "playwright test --config playwright.performance.config.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.0.0",
