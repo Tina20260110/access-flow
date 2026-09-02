@@ -159,10 +159,10 @@ SC-001、SC-005～SC-009。
 - [X] T050 编写并运行浏览器持久化/冲突 E2E，复用 T019 的核心 Gateway 契约向量验证生产 IndexedDB adapter：两个页面持有同一 Pending revision，首个决定成功，第二个使用 stale `expectedRevision` 提交后收到 `CONFLICT`，主动 refetch 详情和列表并恢复相同终态；重开与重置仍保持契约一致，完成 `e2e/approval-conflict.spec.ts`（FR-021、FR-028；SC-005、SC-009）
 - [X] T051 按 quickstart 完成键盘、label、焦点、错误关联、live region、对话框 Escape/焦点恢复，以及列表/详情直接展示状态与风险、详情无需展开即可识别下一步、High Risk/最终状态/关键下一步非颜色表达的检查，并修复发现的问题，涉及 `src/index.css`、`src/components/RiskBadge.tsx`、`src/components/StatusBadge.tsx`、`src/features/request-create/CreateRequestForm.tsx`、`src/features/request-detail/RequestDetails.tsx`、`src/features/request-detail/ApprovalPanel.tsx`、`src/features/request-detail/RejectDialog.tsx`（FR-022、FR-025、FR-026；SC-007、SC-008）
 - [X] T052 按 `specs/001-access-request-mvp/quickstart.md` 完成四组手工验收与重开持久化，并正式验证 SC-003：在 Chromium + production preview 中准备至少 1,000 条当前员工可见申请，对文本搜索、状态筛选、风险筛选、组合筛选和翻页各执行 20 次，测量从提交操作到新结果或明确状态可见，汇总样本计算 P95 且必须 ≤ 2 秒，首次应用启动时间不计入；仅在有该真实浏览器测量证据时修复 `src/features/request-list/request-list.queries.ts`、`src/pages/RequestListPage.tsx`（SC-003、SC-006、SC-008、SC-009；Constitution VIII）
-- [ ] T053 运行 `npm run lint` 并修复全部问题，不使用禁用规则绕过，检查 `eslint.config.js`、`src/`、`e2e/`（Constitution I、II、VII）
-- [ ] T054 运行 `npm run typecheck` 并修复全部 strict 错误，确认业务代码无显式 `any`、双重断言或关闭检查，检查 `tsconfig.json`、`src/`、`e2e/`（Constitution I）
-- [ ] T055 运行 `npm run test`，确保全部 domain、schema、Gateway 与 RTL 测试通过且无仅为覆盖率存在的断言，检查 `vitest.config.ts`、`src/domain/`、`src/data/`、`src/features/`、`src/test/`（Constitution VI；SC-004～SC-007）
-- [ ] T056 运行 `npm run build` 验证 production build，再使用 `npm run preview` 验证应用内导航和具备 history fallback 的 production preview 中 `/requests/:requestId` 路由行为；不要求 `dist/` 自行处理服务器 fallback，并在 `specs/001-access-request-mvp/quickstart.md` 明确静态托管必须将 `/requests/:requestId` 等未知服务器路径 fallback 到 `index.html`，检查 `vite.config.ts`、`src/app/router.tsx`、`dist/`（FR-016、FR-028；Plan：目标平台）
+- [X] T053 运行 `npm run lint` 并修复全部问题，不使用禁用规则绕过，检查 `eslint.config.js`、`src/`、`e2e/`（Constitution I、II、VII）
+- [X] T054 运行 `npm run typecheck` 并修复全部 strict 错误，确认业务代码无显式 `any`、双重断言或关闭检查，检查 `tsconfig.json`、`src/`、`e2e/`（Constitution I）
+- [X] T055 运行 `npm run test`，确保全部 domain、schema、Gateway 与 RTL 测试通过且无仅为覆盖率存在的断言，检查 `vitest.config.ts`、`src/domain/`、`src/data/`、`src/features/`、`src/test/`（Constitution VI；SC-004～SC-007）
+- [X] T056 运行 `npm run build` 验证 production build，再使用 `npm run preview` 验证应用内导航和具备 history fallback 的 production preview 中 `/requests/:requestId` 路由行为；不要求 `dist/` 自行处理服务器 fallback，并在 `specs/001-access-request-mvp/quickstart.md` 明确静态托管必须将 `/requests/:requestId` 等未知服务器路径 fallback 到 `index.html`，检查 `vite.config.ts`、`src/app/router.tsx`、`dist/`（FR-016、FR-028；Plan：目标平台）
 
 **最终门禁**：T049～T056 全部通过后，AccessFlow MVP 才可视为实现完成。
 

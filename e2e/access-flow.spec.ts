@@ -24,8 +24,22 @@ async function findRequestFromList(
   await search.fill(options.search)
   await page.getByRole('button', { name: '搜索' }).focus()
   await page.keyboard.press('Enter')
+  await expect(page).toHaveURL(
+    (url) => url.searchParams.get('q') === options.search,
+  )
   await page.getByLabel('申请状态').selectOption(options.status)
+  await expect(page).toHaveURL(
+    (url) =>
+      url.searchParams.get('q') === options.search &&
+      url.searchParams.get('status') === options.status,
+  )
   await page.getByLabel('风险等级').selectOption(options.risk)
+  await expect(page).toHaveURL(
+    (url) =>
+      url.searchParams.get('q') === options.search &&
+      url.searchParams.get('status') === options.status &&
+      url.searchParams.get('risk') === options.risk,
+  )
 
   const requestLink = page.getByRole('link', { name: options.linkName })
   await expect(requestLink).toBeVisible()
@@ -107,6 +121,7 @@ test.describe('AccessFlow 核心业务闭环', () => {
 
     await test.step('切换到实际负责审批员工并完成批准', async () => {
       await page.getByLabel('当前演示员工').selectOption('user-carol')
+      await expect(page.getByLabel('当前演示员工')).toHaveValue('user-carol')
       await expect(page).toHaveURL(/\/requests$/)
       await findRequestFromList(page, {
         linkName: '查看 Alice Chen 的生产部署后台申请',
@@ -129,6 +144,7 @@ test.describe('AccessFlow 核心业务闭环', () => {
       await expect(page.getByText('审批结果：已批准')).toBeVisible()
 
       await page.getByLabel('当前演示员工').selectOption('user-alice')
+      await expect(page.getByLabel('当前演示员工')).toHaveValue('user-alice')
       await expect(page).toHaveURL(/\/requests$/)
       await findRequestFromList(page, {
         linkName: '查看 Alice Chen 的生产部署后台申请',

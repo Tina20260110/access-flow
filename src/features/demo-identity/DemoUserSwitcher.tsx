@@ -1,4 +1,10 @@
-import { useState, type ChangeEvent, type ReactElement } from 'react'
+import {
+  useEffect,
+  useRef,
+  useState,
+  type ChangeEvent,
+  type ReactElement,
+} from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 
 import { useDemoUsersQuery } from '../../app/query-client'
@@ -11,6 +17,18 @@ export function DemoUserSwitcher(): ReactElement {
   const location = useLocation()
   const navigate = useNavigate()
   const [preferenceError, setPreferenceError] = useState<string | null>(null)
+  const previousDemoUserIdRef = useRef(currentDemoUserId)
+
+  useEffect(() => {
+    const identityChanged =
+      previousDemoUserIdRef.current !== currentDemoUserId
+    previousDemoUserIdRef.current = currentDemoUserId
+
+    // 身份成功落地后再离开依赖旧 viewer 的页面，避免 Context 更新与导航相互竞争。
+    if (identityChanged && location.pathname !== '/requests') {
+      void navigate('/requests')
+    }
+  }, [currentDemoUserId, location.pathname, navigate])
 
   function handleChange(event: ChangeEvent<HTMLSelectElement>): void {
     const userIdResult = demoUserIdSchema.safeParse(event.currentTarget.value)
@@ -19,10 +37,6 @@ export function DemoUserSwitcher(): ReactElement {
     try {
       setCurrentDemoUserId(userIdResult.data)
       setPreferenceError(null)
-
-      if (location.pathname !== '/requests') {
-        void navigate('/requests')
-      }
     } catch {
       setPreferenceError('无法保存当前演示员工，请重试。')
     }

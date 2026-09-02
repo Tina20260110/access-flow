@@ -95,7 +95,7 @@ test.describe('Quickstart 浏览器验收', () => {
     await expect(page).toHaveURL(
       (url) => url.searchParams.get('q') === '内部知识库',
     )
-    await expect(page.getByText(/共 \d+ 条申请/)).toBeVisible()
+    await expect(page.getByText('共 2 条申请')).toBeVisible()
     await page.getByLabel('申请状态').selectOption('Pending')
     await expect(page).toHaveURL(
       (url) =>

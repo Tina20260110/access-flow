@@ -1,4 +1,10 @@
-import { useEffect, useMemo, type ReactElement } from 'react'
+import {
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  type ReactElement,
+} from 'react'
 import { useSearchParams } from 'react-router-dom'
 
 import { useDemoIdentity } from '../features/demo-identity/demo-identity-context'
@@ -34,6 +40,10 @@ export function RequestListPage(): ReactElement {
     () => parseListQuery(new URLSearchParams(rawSearch)),
     [rawSearch],
   )
+  const stagedQueryRef = useRef(query)
+  useLayoutEffect(() => {
+    stagedQueryRef.current = query
+  }, [query])
   const canonicalSearch = serializeListQuery(query).toString()
   const listQuery = useRequestListQuery(currentDemoUserId, query)
   const needsVisibleScopeCheck =
@@ -68,14 +78,21 @@ export function RequestListPage(): ReactElement {
     )
   }, [listQuery.data, listQuery.isPlaceholderData, query, setSearchParams])
 
-  function commitQuery(nextQuery: ListQueryState): void {
+  function commitQuery(
+    updateQuery: (currentQuery: ListQueryState) => ListQueryState,
+  ): void {
+    // URL 仍是事实来源；ref 只串行化 Router 提交前发生的连续操作，URL 更新后立即由解析结果覆盖。
+    const currentQuery = stagedQueryRef.current
+    const nextQuery = updateQuery(currentQuery)
+    const currentSearch = serializeListQuery(currentQuery).toString()
     const nextSearch = serializeListQuery(nextQuery).toString()
-    if (nextSearch === canonicalSearch) return
+    if (nextSearch === currentSearch) return
+    stagedQueryRef.current = nextQuery
     setSearchParams(new URLSearchParams(nextSearch))
   }
 
   function clearQuery(): void {
-    commitQuery(DEFAULT_LIST_QUERY)
+    commitQuery(() => DEFAULT_LIST_QUERY)
   }
 
   let content: ReactElement
@@ -156,7 +173,9 @@ export function RequestListPage(): ReactElement {
         <RequestTable
           page={listQuery.data}
           onPageChange={(page) => {
-            commitQuery(setListQueryPage(query, page))
+            commitQuery((currentQuery) =>
+              setListQueryPage(currentQuery, page),
+            )
           }}
         />
       </>
@@ -173,13 +192,19 @@ export function RequestListPage(): ReactElement {
         key={query.search}
         query={query}
         onRiskLevelChange={(riskLevel) => {
-          commitQuery(setListQueryRiskLevel(query, riskLevel))
+          commitQuery((currentQuery) =>
+            setListQueryRiskLevel(currentQuery, riskLevel),
+          )
         }}
         onSearch={(search) => {
-          commitQuery(setListQuerySearch(query, search))
+          commitQuery((currentQuery) =>
+            setListQuerySearch(currentQuery, search),
+          )
         }}
         onStatusChange={(status) => {
-          commitQuery(setListQueryStatus(query, status))
+          commitQuery((currentQuery) =>
+            setListQueryStatus(currentQuery, status),
+          )
         }}
       />
       {content}
