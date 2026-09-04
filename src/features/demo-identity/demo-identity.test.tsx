@@ -15,11 +15,16 @@ import {
   useDemoUsersQuery,
 } from '../../app/query-client'
 import { useAccessFlowGateway } from '../../app/access-flow-context'
-import { AccessFlowRoutes } from '../../app/router'
+import { AccessFlowRoutes, AppRouter } from '../../app/router'
 import {
   DEMO_USER_PREFERENCE_KEY,
   DemoPreferencesAdapter,
 } from '../../data/demo-preferences'
+import {
+  DemoTransport,
+  DeterministicFaultController,
+} from '../../data/demo-transport'
+import type { AccessFlowGateway } from '../../data/access-flow-gateway'
 import type { ListQueryState } from '../../domain/models'
 import { MemoryAccessFlowGateway } from '../../test/memory-gateway'
 import { gatewayContractRuntime } from '../../test/gateway-contract'
@@ -49,7 +54,7 @@ class TestPreferenceStorage {
 }
 
 type TestRootProps = PropsWithChildren<{
-  gateway: MemoryAccessFlowGateway
+  gateway: AccessFlowGateway
   initialEntry?: string
   queryClient: ReturnType<typeof createAccessFlowQueryClient>
   storage: TestPreferenceStorage
@@ -116,6 +121,8 @@ function renderIdentity(options: {
   initialEntry?: string
   storedUserId?: string
 }) {
+  const initialEntry = options.initialEntry ?? '/requests'
+  window.history.replaceState(window.history.state, '', initialEntry)
   const gateway = new MemoryAccessFlowGateway({
     runtime: gatewayContractRuntime,
   })
@@ -130,9 +137,7 @@ function renderIdentity(options: {
   render(
     <TestRoot
       gateway={gateway}
-      {...(options.initialEntry === undefined
-        ? {}
-        : { initialEntry: options.initialEntry })}
+      initialEntry={initialEntry}
       queryClient={queryClient}
       storage={storage}
     >
@@ -231,6 +236,109 @@ describe('Demo Identity 与根级 Providers', () => {
       networkMode: 'always',
       staleTime: Infinity,
     })
+  })
+
+  it('识别损坏根数据且只在用户确认后显式恢复应用', async () => {
+    const user = userEvent.setup()
+    const gateway = new MemoryAccessFlowGateway({
+      initialState: { schemaVersion: 999 },
+      runtime: gatewayContractRuntime,
+    })
+    const resetDemoData = vi.spyOn(gateway, 'resetDemoData')
+    const queryClient = createAccessFlowQueryClient()
+    const storage = new TestPreferenceStorage()
+    storage.setItem(DEMO_USER_PREFERENCE_KEY, 'user-bob')
+    window.history.replaceState(
+      window.history.state,
+      '',
+      '/requests/request-pending-high',
+    )
+
+    render(
+      <AccessFlowProviders gateway={gateway} queryClient={queryClient}>
+        <DemoIdentityProvider
+          preferences={new DemoPreferencesAdapter(storage)}
+        >
+          <AppRouter />
+        </DemoIdentityProvider>
+      </AccessFlowProviders>,
+    )
+
+    expect(await screen.findByText('Demo 数据已损坏')).toBeInTheDocument()
+    expect(resetDemoData).not.toHaveBeenCalled()
+    expect(
+      screen.getByText(
+        '重置后，当前浏览器中的 AccessFlow Demo 数据将恢复为初始演示数据。',
+      ),
+    ).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: '重置 Demo 数据' }))
+    expect(screen.getByRole('dialog')).toBeInTheDocument()
+    expect(resetDemoData).not.toHaveBeenCalled()
+
+    await user.click(screen.getByRole('button', { name: '确认重置' }))
+
+    expect(
+      await screen.findByRole('heading', { name: '申请列表' }),
+    ).toBeInTheDocument()
+    expect(resetDemoData).toHaveBeenCalledOnce()
+    expect(screen.getByLabelText('当前演示员工')).toHaveValue('user-alice')
+    expect(storage.getItem(DEMO_USER_PREFERENCE_KEY)).toBe('user-alice')
+    expect(screen.getByRole('status')).toHaveTextContent(
+      'Demo 数据已恢复为初始状态。',
+    )
+  })
+
+  it('损坏数据重置失败时保留错误状态并允许重试', async () => {
+    const user = userEvent.setup()
+    const faultController = new DeterministicFaultController()
+    const memoryGateway = new MemoryAccessFlowGateway({
+      initialState: { schemaVersion: 999 },
+      runtime: gatewayContractRuntime,
+    })
+    const resetDemoData = vi.spyOn(memoryGateway, 'resetDemoData')
+    const gateway = new DemoTransport(memoryGateway, {
+      faultController,
+      mutationDelayMs: 0,
+      queryDelayMs: 0,
+    })
+    const queryClient = createAccessFlowQueryClient()
+    const storage = new TestPreferenceStorage()
+    faultController.failNext('resetDemoData')
+    window.history.replaceState(
+      window.history.state,
+      '',
+      '/requests/request-pending-high',
+    )
+
+    render(
+      <AccessFlowProviders gateway={gateway} queryClient={queryClient}>
+        <DemoIdentityProvider
+          preferences={new DemoPreferencesAdapter(storage)}
+        >
+          <AppRouter />
+        </DemoIdentityProvider>
+      </AccessFlowProviders>,
+    )
+
+    expect(await screen.findByText('Demo 数据已损坏')).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: '重置 Demo 数据' }))
+    await user.click(screen.getByRole('button', { name: '确认重置' }))
+
+    expect(
+      await screen.findByText(
+        'Demo 数据重置失败，应用仍处于数据不可用状态。请重试。',
+      ),
+    ).toBeInTheDocument()
+    expect(screen.getByText('Demo 数据已损坏')).toBeInTheDocument()
+    expect(resetDemoData).not.toHaveBeenCalled()
+
+    await user.click(screen.getByRole('button', { name: '重新尝试重置' }))
+
+    expect(
+      await screen.findByRole('heading', { name: '申请列表' }),
+    ).toBeInTheDocument()
+    expect(resetDemoData).toHaveBeenCalledOnce()
   })
 
   it.each([

@@ -29,6 +29,12 @@ import {
 
 const pendingRequestId = accessRequestIdSchema.parse('request-pending-high')
 const bobId = demoUserIdSchema.parse('user-bob')
+const defaultListQuery = {
+  search: '',
+  status: null,
+  riskLevel: null,
+  page: 1,
+} as const
 
 class TestPreferenceStorage {
   readonly #values = new Map<string, string>()
@@ -103,7 +109,7 @@ describe('AppShell Demo 数据重置', () => {
     ).toBeInTheDocument()
   })
 
-  it('成功后清除申请缓存、恢复默认员工并导航到列表', async () => {
+  it('成功后只清除全部 AccessFlow 领域缓存、恢复默认员工并导航到列表', async () => {
     const user = userEvent.setup()
     const gateway = new MemoryAccessFlowGateway({
       runtime: gatewayContractRuntime,
@@ -117,6 +123,17 @@ describe('AppShell Demo 数据重置', () => {
       pendingRequestId,
       bobId,
     )
+    const staleListKey = accessFlowQueryKeys.accessRequests.list(
+      bobId,
+      defaultListQuery,
+    )
+    const resources = await gateway.getResources()
+    const getDemoUsers = vi.spyOn(gateway, 'getDemoUsers')
+    const getResources = vi.spyOn(gateway, 'getResources')
+    const getAccessRequest = vi.spyOn(gateway, 'getAccessRequest')
+    queryClient.setQueryData(accessFlowQueryKeys.resources, resources)
+    queryClient.setQueryData(staleListKey, 'stale-list')
+    queryClient.setQueryData(['unrelated-query'], '应保留')
     expect(queryClient.getQueryData(detailKey)).toBeDefined()
 
     await user.click(
@@ -129,10 +146,21 @@ describe('AppShell Demo 数据重置', () => {
     ).toBeInTheDocument()
     expect(screen.getByLabelText('当前演示员工')).toHaveValue('user-alice')
     expect(storage.getItem(DEMO_USER_PREFERENCE_KEY)).toBe('user-alice')
-    expect(queryClient.getQueryData(detailKey)).toBeUndefined()
+    expect(queryClient.getQueryData(detailKey)).toBeDefined()
+    expect(queryClient.getQueryData(staleListKey)).toBeUndefined()
+    expect(queryClient.getQueryData(accessFlowQueryKeys.resources)).toBeUndefined()
+    expect(queryClient.getQueryData(['unrelated-query'])).toBe('应保留')
+    expect(getDemoUsers).toHaveBeenCalledOnce()
+    expect(getAccessRequest).toHaveBeenCalled()
     expect(screen.getByRole('status')).toHaveTextContent(
       'Demo 数据已恢复为初始状态。',
     )
+
+    await user.click(screen.getByRole('link', { name: '创建申请' }))
+    expect(
+      await screen.findByRole('heading', { name: '创建权限申请' }),
+    ).toBeInTheDocument()
+    expect(getResources).toHaveBeenCalledOnce()
   })
 
   it('失败时保留身份、页面和缓存，并允许原地重试', async () => {

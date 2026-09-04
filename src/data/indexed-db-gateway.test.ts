@@ -143,6 +143,36 @@ describe('IndexedDbAccessFlowGateway 持久化边界', () => {
       await deleteDB(databaseName)
     }
   })
+
+  it('只有显式重置才用有效 seed 替换损坏根文档', async () => {
+    const databaseName = 'access-flow-persistence-corrupt-recovery'
+    const database = await openCorruptDatabase(databaseName)
+    database.close()
+    const gateway = new IndexedDbAccessFlowGateway({
+      databaseName,
+      runtime: gatewayContractRuntime,
+    })
+
+    try {
+      await expect(gateway.getDemoUsers()).rejects.toMatchObject({
+        code: 'CORRUPT_DEMO_DATA',
+      })
+      await expect(gateway.getDemoUsers()).rejects.toMatchObject({
+        code: 'CORRUPT_DEMO_DATA',
+      })
+
+      await gateway.resetDemoData()
+
+      await expect(gateway.getDemoUsers()).resolves.toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ id: 'user-alice' }),
+        ]),
+      )
+    } finally {
+      await gateway.close().catch(() => undefined)
+      await deleteDB(databaseName)
+    }
+  })
 })
 
 async function openCorruptDatabase(databaseName: string) {

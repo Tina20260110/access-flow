@@ -107,6 +107,8 @@ function renderList(options: {
   initialEntry?: string
   storedUserId?: string
 } = {}) {
+  const initialEntry = options.initialEntry ?? '/requests'
+  window.history.replaceState(window.history.state, '', initialEntry)
   const gateway =
     options.gateway ??
     new MemoryAccessFlowGateway({ runtime: gatewayContractRuntime })
@@ -114,7 +116,7 @@ function renderList(options: {
   const view = render(
     <TestRoot
       gateway={gateway}
-      initialEntry={options.initialEntry ?? '/requests'}
+      initialEntry={initialEntry}
       queryClient={queryClient}
       {...(options.storedUserId === undefined
         ? {}

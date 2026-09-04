@@ -1,11 +1,9 @@
 import {
-  useEffect,
-  useRef,
   useState,
   type ChangeEvent,
   type ReactElement,
 } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 import { useDemoUsersQuery } from '../../app/query-client'
 import { demoUserIdSchema } from '../../domain/schemas'
@@ -14,21 +12,8 @@ import { useDemoIdentity } from './demo-identity-context'
 export function DemoUserSwitcher(): ReactElement {
   const { currentDemoUserId, setCurrentDemoUserId } = useDemoIdentity()
   const usersQuery = useDemoUsersQuery()
-  const location = useLocation()
   const navigate = useNavigate()
   const [preferenceError, setPreferenceError] = useState<string | null>(null)
-  const previousDemoUserIdRef = useRef(currentDemoUserId)
-
-  useEffect(() => {
-    const identityChanged =
-      previousDemoUserIdRef.current !== currentDemoUserId
-    previousDemoUserIdRef.current = currentDemoUserId
-
-    // 身份成功落地后再离开依赖旧 viewer 的页面，避免 Context 更新与导航相互竞争。
-    if (identityChanged && location.pathname !== '/requests') {
-      void navigate('/requests')
-    }
-  }, [currentDemoUserId, location.pathname, navigate])
 
   function handleChange(event: ChangeEvent<HTMLSelectElement>): void {
     const userIdResult = demoUserIdSchema.safeParse(event.currentTarget.value)
@@ -37,6 +22,15 @@ export function DemoUserSwitcher(): ReactElement {
     try {
       setCurrentDemoUserId(userIdResult.data)
       setPreferenceError(null)
+      const browserLocation = event.currentTarget.ownerDocument.defaultView?.location
+      const isListRoute = browserLocation?.pathname === '/requests'
+      // 浏览器地址可能已进入详情，而并发渲染中的 AppShell 仍是列表快照；以当前地址决定是否保留列表查询。
+      void navigate(
+        isListRoute
+          ? `/requests${browserLocation.search}`
+          : '/requests',
+        { flushSync: true, replace: isListRoute },
+      )
     } catch {
       setPreferenceError('无法保存当前演示员工，请重试。')
     }

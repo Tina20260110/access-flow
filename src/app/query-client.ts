@@ -2,6 +2,7 @@ import {
   QueryClient,
   queryOptions,
   useQuery,
+  type Query,
 } from '@tanstack/react-query'
 
 import type { AccessFlowGateway } from '../data/access-flow-gateway'
@@ -57,6 +58,7 @@ export function demoUsersQueryOptions(gateway: AccessFlowGateway) {
     queryKey: accessFlowQueryKeys.demoUsers,
     queryFn: () => gateway.getDemoUsers(),
     networkMode: 'always',
+    retry: false,
     staleTime: DIRECTORY_STALE_TIME,
   })
 }
@@ -79,4 +81,27 @@ export function useDemoUsersQuery() {
 export function useResourceCatalogQuery() {
   const gateway = useAccessFlowGateway()
   return useQuery(resourceCatalogQueryOptions(gateway))
+}
+
+export async function resetAccessFlowDomainQueryCache(
+  queryClient: QueryClient,
+): Promise<void> {
+  const domainRoots = new Set<unknown>([
+    accessFlowQueryKeys.demoUsers[0],
+    accessFlowQueryKeys.resources[0],
+    accessFlowQueryKeys.accessRequests.all[0],
+  ])
+
+  const domainQueryFilter = {
+    predicate: (query: Query) => domainRoots.has(query.queryKey[0]),
+  } as const
+
+  // 非活动数据直接移除；活动数据在重置操作完成前强制从 Gateway 刷新，避免临时卸载整个应用壳。
+  queryClient.removeQueries({ ...domainQueryFilter, type: 'inactive' })
+  await queryClient.invalidateQueries({
+    ...domainQueryFilter,
+    refetchType: 'active',
+  })
+  // 导航可能在刷新期间使详情 Query 变为非活动，再清理一次才不会留下旧页面缓存。
+  queryClient.removeQueries({ ...domainQueryFilter, type: 'inactive' })
 }

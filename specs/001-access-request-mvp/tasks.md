@@ -271,3 +271,8 @@ T018 + T020 + T022 → T023 → T024
 - 资源通过 `approverCandidateIds` 确定 `approverId`，任何路径都必须保持 `requesterId !== approverId`。
 - UI 不直接读写 IndexedDB/localStorage；业务数据只经 Gateway，身份偏好只经专用 adapter。
 - 每项实现任务完成时运行其对应的最小测试集；Phase 7 再运行全量门禁。
+
+## Phase 8: Convergence
+
+- [X] T057 在 Demo Users 启动查询因 `CORRUPT_DEMO_DATA` 失败时提供可访问、带二次确认且仅通过 `AccessFlowGateway.resetDemoData()` 执行的显式恢复入口；成功后恢复默认身份并进入 `/requests`，失败时保留错误状态并允许重试，同时补充启动损坏数据的集成测试，涉及 `src/features/demo-identity/DemoIdentityProvider.tsx`、`src/app/AppShell.tsx` 及对应测试 per plan: 数据访问与持久化、领域模型与校验边界 (partial)
+- [X] T058 完善 Demo 重置成功后的领域 Query 清理，显式移除 Demo Users、Resource Catalog 与 Access Requests 缓存并重新获取活动查询；保持重置失败时所有有效缓存不变，扩展 `src/app/app-shell.test.tsx` 验证长 `staleTime` 目录不会保留旧根文档数据 per plan: 重置与 Query 配置、T048 (partial)

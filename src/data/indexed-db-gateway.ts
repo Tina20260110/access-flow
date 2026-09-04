@@ -244,12 +244,12 @@ export class IndexedDbAccessFlowGateway implements AccessFlowGateway {
   }
 
   async resetDemoData(): Promise<void> {
-    await this.#ensureInitialized()
     const resetState = createSeedState(getLocalDateOnly(this.#runtime.now()))
     const database = await this.#getDatabase()
     const transaction = database.transaction(STORE_NAME, 'readwrite')
 
     try {
+      // 显式恢复必须能覆盖无法解析的根文档，但普通读取仍绝不会自动重置。
       await transaction.store.put(resetState, ROOT_DOCUMENT_KEY)
       await transaction.done
     } catch (error: unknown) {
